@@ -61,4 +61,4 @@ def scrape_mentalmars():
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"Fehler MentalMars: {e}"
+        print(f"Fehler MentalMars: {e}")
