@@ -61,4 +61,39 @@ def scrape_mentalmars():
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"Fehler MentalMars: {e}")
+        print(f"Fehler MentalMars: {e}")  # <-- Klammer korrigiert
+        return []
+    codes = []
+    for block in soup.find_all("li"):
+        text = block.get_text(separator=" ").strip()
+        if "Golden Key" in text and "-" in text:
+            codes.append(text)
+    return codes
+
+def scrape_mobalytics():
+    url = "https://mobalytics.gg/borderlands-4/shift-codes-borderlands-4"
+    try:
+        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        soup = BeautifulSoup(r.text, "html.parser")
+    except Exception as e:
+        print(f"Fehler Mobalytics: {e}")
+        return []
+    codes = []
+    for block in soup.find_all("li"):
+        text = block.get_text(separator=" ").strip()
+        if "Golden Key" in text and "-" in text:
+            codes.append(text)
+    return codes
+
+def fetch_all_shift_codes():
+    codes = []
+    codes += scrape_gameradar()
+    codes += scrape_mentalmars()
+    codes += scrape_mobalytics()
+    return get_valid_codes(codes)
+
+def load_posted_codes():
+    if not os.path.exists(POSTED_FILE):
+        return set()
+    with open(POSTED_FILE, "r", encoding="utf-8") as f:
+        return
