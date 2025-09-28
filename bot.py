@@ -79,31 +79,3 @@ def scrape_mobalytics():
         text = block.get_text(separator=" ").strip()
         if "Golden Key" in text and "-" in text:
             codes.append(text)
-    return codes
-
-def fetch_all_shift_codes():
-    codes = []
-    codes += scrape_gameradar()
-    codes += scrape_mentalmars()
-    codes += scrape_mobalytics()
-    return get_valid_codes(codes)
-
-def load_posted_codes():
-    if not os.path.exists(POSTED_FILE):
-        return set()
-    with open(POSTED_FILE, "r", encoding="utf-8") as f:
-        return set(line.strip() for line in f.readlines())
-
-def save_posted_codes(codes):
-    with open(POSTED_FILE, "w", encoding="utf-8") as f:
-        for code in codes:
-            f.write(code + "\n")
-
-async def post_codes():
-    channel = bot.get_channel(CHANNEL_ID)
-    if channel is None:
-        print("❌ FEHLER: Channel nicht gefunden!")
-        return
-    all_codes = fetch_all_shift_codes()
-    posted_codes = load_posted_codes()
-    new_codes = [c for c in all_codes if c not in pos_]()_
