@@ -61,7 +61,7 @@ def scrape_mentalmars():
         r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         soup = BeautifulSoup(r.text, "html.parser")
     except Exception as e:
-        print(f"Fehler MentalMars: {e}")  # <-- Klammer korrigiert
+        print(f"Fehler MentalMars: {e}")
         return []
     codes = []
     for block in soup.find_all("li"):
@@ -96,4 +96,56 @@ def load_posted_codes():
     if not os.path.exists(POSTED_FILE):
         return set()
     with open(POSTED_FILE, "r", encoding="utf-8") as f:
+        return set(line.strip() for line in f.readlines())
+
+def save_posted_codes(codes):
+    with open(POSTED_FILE, "w", encoding="utf-8") as f:
+        for code in codes:
+            f.write(code + "\n")
+
+async def post_codes():
+    channel = bot.get_channel(CHANNEL_ID)
+    if channel is None:
+        print("❌ FEHLER: Channel nicht gefunden!")
         return
+    all_codes = fetch_all_shift_codes()
+    posted_codes = load_posted_codes()
+    new_codes = [c for c in all_codes if c not in posted_codes]
+    if not new_codes:
+        print("Keine neuen Codes gefunden.")
+        return
+    msg = "🔑 **Neue Borderlands 4 SHiFT-Codes:**\n\n"
+    for c in new_codes:
+        msg += f"• {c}\n"
+    await channel.send(msg)
+    save_posted_codes(posted_codes.union(new_codes))
+
+# ==================== Tasks ====================
+
+@bot.event
+async def on_ready():
+    print(f"✅ Eingeloggt als {bot.user}")
+    await post_codes()  # Sofort posten
+    check_codes.start()  # Task alle 24h
+
+@tasks.loop(hours=24)
+async def check_codes():
+    await post_codes()
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send("Pong! 🏓")
+
+# ==================== Dummy-Webserver für Render ====================
+
+async def handle(request):
+    return web.Response(text="Bot is running!")
+
+app = web.Application()
+app.router.add_get("/", handle)
+
+# Render stellt PORT bereit, Default 10000
+asyncio.create_task(web._run_app(app, port=int(os.environ.get("PORT", 10000))))
+
+# ==================== Bot starten ====================
+bot.run(os.environ["DISCORD_TOKEN"])
