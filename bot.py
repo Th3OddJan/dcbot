@@ -1,4 +1,3 @@
-# bot.py - Borderlands 4 SHiFT-Code Bot (Render Free Tier, sauber)
 import os
 import discord
 from discord.ext import tasks, commands
@@ -9,7 +8,7 @@ from bs4 import BeautifulSoup
 from aiohttp import web
 import asyncio
 
-# ==================== CONFIG ====================
+# ===== CONFIG =====
 CHANNEL_ID = 1421873779163922502
 POSTED_FILE = "posted_codes.txt"
 TOKEN = os.environ["DISCORD_TOKEN"]
@@ -18,8 +17,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ==================== SCRAPER ====================
-
+# ===== SCRAPER =====
 def get_valid_codes(codes_list):
     today = datetime.now()
     valid_codes = []
@@ -106,4 +104,6 @@ async def post_codes():
     if channel is None:
         print("❌ FEHLER: Channel nicht gefunden!")
         return
-    all_codes = fetch_
+    all_codes = fetch_all_shift_codes()
+    posted_codes = load_posted_codes()
+    new_codes = [c for c in all_codes if c not in pos_]()_
